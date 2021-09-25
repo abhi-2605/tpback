@@ -12,10 +12,12 @@ var MongoClient = require('mongodb').MongoClient;
 const register = require('../backend/src/model/reguser')
 const newmovie = require('../backend/src/model/addmovie')
 const movie = require('../backend/src/model/movie');
-const msg = require('../backend/src/model/msg')
-    // app.get('/', (req, res) => {
-    //     res.send('hi')
-    // })
+const msg = require('../backend/src/model/msg');
+const { title } = require('process');
+const moviesdata = require('../backend/src/model/addmovie');
+// app.get('/', (req, res) => {
+//     res.send('hi')
+// })
 
 var url = "mongodb+srv://tsib1:Qwerty2605@cluster0.ajl7g.mongodb.net/MDATA?retryWrites=true&w=majority";
 
@@ -196,5 +198,140 @@ app.post('/getmsg', function(req, res, next) {
     })
 })
 
+app.delete('/remove/:id', (req, res) => {
+
+
+    let id = req.params.id
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("MDATA");
+        //Find the first document in the customers collection:
+
+
+        dbo.collection('movie').findOneAndDelete({ title: id }).then(function(doc) {
+            if (doc) {
+                res.send()
+                console.log(doc)
+            } else {
+                console.log(id)
+
+            }
+        })
+    });
+
+
+
+
+
+
+})
+
+
+app.post('/logincheck', (req, res) => {
+    register.find({ email: req.body.data.email }).select('role') // selects all the id which is not equal to the given id
+        .then(function(data) {
+
+            if (data) {
+
+                res.send(data);
+            } else {
+                res.json({ id: "null", name: "NO SUCH USER REGISTERED" })
+            }
+
+        });
+
+})
+
+app.delete('/removecom/:id', (req, res) => {
+
+
+    let id = req.params.id
+
+
+    //Find the first document in the customers collection:
+
+
+    msg.findByIdAndDelete({ _id: id }).then(function(doc) {
+        if (doc) {
+            res.send()
+            console.log(doc)
+        } else {
+            console.log(id)
+
+        }
+
+    });
+
+
+
+
+
+
+})
+
+
+app.get('/up/:id', (req, res) => {
+    let id = req.params.id
+    console.log(id)
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("MDATA");
+        //Find the first document in the customers collection:
+
+
+        dbo.collection('movie').findOne({ title: id }).then(function(doc) {
+            if (doc) {
+                res.send(doc)
+                console.log(doc)
+            } else {
+                console.log(id)
+
+            }
+        })
+    });
+
+})
+
+
+
+app.put('/update', (req, res) => {
+    console.log("hey")
+    console.log(req.body)
+    let title = req.body.title,
+        year = req.body.year,
+        genres = req.body.genres,
+        director = req.body.director,
+        actors = req.body.actors,
+        plot = req.body.plot,
+        posterUrl = req.body.posterUrl
+
+
+
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("MDATA");
+        //Find the first document in the customers collection:
+
+
+        dbo.collection('movie').findOneAndUpdate({ "title": title }, {
+                $set: {
+                    "title": title,
+                    "year": year,
+                    "genres": genres,
+                    "director": director,
+                    "actors": actors,
+                    "plot": plot,
+                    "posterUrl": posterUrl
+                }
+            })
+            .then(function() {
+                res.send();
+            })
+    });
+
+
+})
 
 app.listen(process.env.PORT || 2222)

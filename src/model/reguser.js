@@ -26,7 +26,7 @@ const registerSchema = new Schema({
     pass: String,
     num: String,
     role: String,
-    userrole: String
+
 
 });
 // registerSchema.statics.hashPass = function hashPass(pass) {
